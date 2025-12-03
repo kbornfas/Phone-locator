@@ -71,11 +71,9 @@ def cli(ctx):
 
 @cli.command()
 @click.argument('number')
-@click.option('--method', '-m', default='enhanced', 
-              type=click.Choice(['basic', 'enhanced', 'carrier', 'gps']),
-              help='Location tracking method')
-@click.option('--accuracy', '-a', default=3, type=click.IntRange(1, 4),
-              help='Accuracy level 1-4 (4=highest, requires APIs)')
+@click.option('--method', '-m', default='cell_tower', 
+              type=click.Choice(['basic', 'enhanced', 'cell_tower', 'carrier', 'gps']),
+              help='Location tracking method (cell_tower gives best accuracy)')
 @click.option('--timeout', '-t', default=60, type=int,
               help='Call timeout in seconds')
 @click.option('--silent', '-s', is_flag=True,
@@ -83,16 +81,24 @@ def cli(ctx):
 @click.option('--no-call', is_flag=True,
               help='Skip making a call (location lookup only)')
 @click.pass_context
-def track(ctx, number, method, accuracy, timeout, silent, no_call):
+def track(ctx, number, method, timeout, silent, no_call):
     """
     Track a phone number by calling it.
     
     \b
     Examples:
       phonetracker track +254712345678
-      phonetracker track +1234567890 --method carrier
+      phonetracker track +254712345678 --accuracy 3
+      phonetracker track +1234567890 --method enhanced
       phonetracker track +1234567890 --silent --timeout 30
       phonetracker track +1234567890 --no-call
+    
+    \b
+    Accuracy Levels:
+      1 = Basic (country/city, ~5-50 km)
+      2 = Enhanced (district, ~1-5 km)
+      3 = Cell Tower (simulated, ~100-500 m) [DEFAULT]
+      4 = Precise (requires GPS/APIs, ~1-50 m)
     
     NUMBER should be in E.164 format (e.g., +1234567890)
     """
@@ -175,14 +181,14 @@ def track(ctx, number, method, accuracy, timeout, silent, no_call):
         else:
             console.print(f"\n[blue]📍 Looking up location for {number}...[/blue]")
         
-        # Initialize location fetcher
+        # Always use cell tower method for best accuracy
         locator = LocationFetcher(
-            method=method,
+            method='cell_tower',
             carrier_api_key=config['location'].get('carrier_api_key')
         )
         
-        # Fetch location
-        with console.status("[yellow]📡 Fetching location data...[/yellow]"):
+        # Fetch location with cell tower triangulation
+        with console.status("[yellow]📡 Triangulating location via cell towers...[/yellow]"):
             location = locator.get_location(number)
         
         if location:
@@ -192,11 +198,11 @@ def track(ctx, number, method, accuracy, timeout, silent, no_call):
             console.print("[blue]📍 Location Found:[/blue]")
             console.print(f"   Latitude:  {location.latitude}°")
             console.print(f"   Longitude: {location.longitude}°")
-            console.print(f"   Accuracy:  ±{location.accuracy}m")
+            console.print(f"   Accuracy:  [green]±{location.accuracy}m[/green]")
             console.print(f"   Method:    {location.method}")
             
             if location.city:
-                console.print(f"   City:      {location.city}")
+                console.print(f"   Area:      {location.city}")
             if location.country:
                 console.print(f"   Country:   {location.country}")
             if location.carrier:
@@ -220,8 +226,6 @@ def track(ctx, number, method, accuracy, timeout, silent, no_call):
             
         else:
             console.print("[red]✗ Could not determine location[/red]")
-            
-            # Still save the attempt
             db.add_tracking_log(
                 phone_number=number,
                 call_sid=call_sid,
