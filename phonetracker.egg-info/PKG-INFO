@@ -1,3 +1,45 @@
+Metadata-Version: 2.4
+Name: phonetracker
+Version: 1.0.0
+Summary: CLI tool to track phone locations via VoIP calls
+Home-page: https://github.com/kbornfas/Phone-locator
+Author: Your Name
+Author-email: your.email@example.com
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Communications :: Telephony
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.1.7
+Requires-Dist: rich>=13.7.0
+Requires-Dist: twilio>=8.11.0
+Requires-Dist: requests>=2.31.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: sqlalchemy>=2.0.23
+Requires-Dist: cryptography>=41.0.7
+Requires-Dist: phonenumbers>=8.13.26
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
 # PhoneTracker CLI
 
 A powerful command-line tool for tracking phone locations via VoIP calls using Twilio.

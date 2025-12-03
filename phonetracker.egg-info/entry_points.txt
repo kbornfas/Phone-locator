@@ -1,0 +1,2 @@
+[console_scripts]
+phonetracker = cli.main:main
